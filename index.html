@@ -1,0 +1,138 @@
+<style>
+.mntable-container {
+	display: block;
+	width: 100%;
+}
+</style>
+<script src="js/jquery-3.2.1.min.js"></script>
+<script type="text/javascript">
+var isDebug = true;
+//var isDebug = false;
+function debug(msg, level){
+    var Global = this;
+    if(!(Global.isDebug && Global.console && Global.console.log)){
+        return;
+    }
+    level = level||'info';
+    Global.console.log(level + ': '+ msg);
+}
+
+(function($) {
+    "use strict";
+
+	var option = "";
+	var defaultOption = {
+		title: "default title",
+		description: "",
+		mnContainer: "mntable-container",
+		mnTitleMain: "mntable-title-main",
+		mnTitleText: "mntable-title-text",
+		mnTitleToolbar: "mntable-title-toolbar",
+		mnTableMain: "mntable-main",
+		mnTable: "mntable",
+		mnTableHeader: "mntable-header",
+		mnTableHeaderItem: "mntable-header-item",
+		mnTableBody: "mntable-body",
+		mnBottom: "mntable-bottom",
+
+		toolbar: {
+			items: []
+		},
+
+		fields: [],
+	};
+
+	$.fn.mntable = function ( opts ) {
+		var mnframe;
+		option = $.extend({}, defaultOption, opts || {});
+		$.mntable_mainframe_create(this);
+		$.mntable_title_create();
+		$.mntable_table_create();
+	};
+	
+	$.mntable_mainframe_create = function(current) {
+		var mainframe;
+		debug("mntable_create_mainframe()");
+		mainframe  = "<div class=" + option.mnContainer + ">";
+		mainframe += "<div class=" + option.mnTitleMain + "></div>";
+		mainframe += "<div class=" + option.mnTableMain + "></div>";
+		mainframe += "<div class=" + option.mnBottom + "></div>";
+		mainframe += "</div>";
+		$(current).html(mainframe);
+	};
+
+	$.mntable_title_create = function() {
+		debug("mntable_title_create()");
+		$("." + option.mnTitleMain).html("");
+		$("." + option.mnTitleMain).append("<div class=" + option.mnTitleText + ">" + option.title + "</div>");
+		$("." + option.mnTitleMain).append("<div class=" + option.mnTitleToolbar + "></div>");
+	};
+
+	$.mntable_table_header_create = function() {
+		var key, value, htmlhdr;
+		debug("mntable_table_header_create()");
+		htmlhdr  = "<tr>";
+        $.each(option.fields, function( key, value ) {
+            if(typeof(value.list) === 'undefined')
+                value.list = true;
+            if(value.list) {
+				htmlhdr += "<th><div class=\"" + option.mnTableHeaderItem + "\"";
+				if(typeof(value.width)) {
+					htmlhdr += " style: { width: '" + value.width + "'}";
+				}
+				htmlhdr += ">";
+				htmlhdr += key 
+				htmlhdr += "</div>";
+				htmlhdr += "</th>";
+            }
+        });
+		htmlhdr += "</tr>";
+		$("." + option.mnTableHeader).append(htmlhdr);
+debug(htmlhdr);
+	};
+
+	$.mntable_table_create = function() {
+		debug("mntable_table_create()");
+		$("." + option.mnTableMain).html("");
+		$("." + option.mnTableMain).append("<table class=" + option.mnTable + ">");
+		$("." + option.mnTableMain).append("<thead class=" + option.mnTableHeader + "></thead>");
+		$("." + option.mnTableMain).append("<tbody class=" + option.mnTableBody + "></tbody>");
+		$("." + option.mnTableMain).append("</table>");
+		$.mntable_table_header_create();
+	};
+
+	$.mntable_bottom_create = function() {
+debug("mntable_bottom_create()");
+	};
+
+}(jQuery));
+
+$("#test_table").ready( function() {
+	$("#test_table").mntable({
+		title: "Test Table List",
+		fields: {
+			id: {
+				title: "ID",
+				list: true,
+				width: "30%",
+				
+			}, 
+			name: {
+				title: "Name",
+				list: true,
+				width: "30%",
+			}, 
+			title: {
+				title: "Title",
+				width: "30%",
+			}, 
+			createtime: {
+				title: "Date",
+				list: false,
+			}, 
+		},
+	});
+});
+</script>
+
+<div id="test_table">TEST-MNTABLE</div>
